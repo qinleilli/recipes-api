@@ -1,3 +1,20 @@
+// Recipes API
+//
+// This is a sample recipes API.
+//
+//     Schemes: http
+//     Host: localhost:8080
+//     BasePath: /
+//     Version: 1.0.0
+//     Contact: qinleilli<qinleilli@example.com>
+//
+//     Consumes:
+//     - application/json
+//
+//     Produces:
+//     - application/json
+//
+// swagger:meta
 package main
 
 import (
@@ -18,7 +35,9 @@ func init() {
 	_ = json.Unmarshal(file, &recipes)
 }
 
+// swagger:parameters recipes newRecipe
 type Recipe struct {
+	//swagger:ignore
 	ID           string    `json:"id"`
 	Name         string    `json:"name"`
 	Tags         []string  `json:"tags"`
@@ -27,6 +46,16 @@ type Recipe struct {
 	PublishedAt  time.Time `json:"published_at"`
 }
 
+// swagger:operation POST /recipes recipes newRecipe
+// Create a new recipe
+// ---
+// produces:
+// - application/json
+// responses:
+//     '200':
+//         description: Successful operation
+//     '400':
+//         description: Invalid input
 func NewRecipeHandler(c *gin.Context) {
 	var recipe Recipe
 	if err := c.ShouldBindJSON(&recipe); err != nil {
@@ -42,10 +71,36 @@ func NewRecipeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, recipe)
 }
 
+// swagger:operation GET /recipes recipes listRecipes
+// Returns list of recipes
+// ---
+// produces:
+// - application/json
+// responses:
+//     '200':
+//         description: Successful operation
 func ListRecipesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, recipes)
 }
 
+// swagger:operation PUT /recipes/{id} recipes updateRecipe
+// Update an existing recipe
+// ---
+// parameters:
+// - name: id
+//   in: path
+//   description: ID of the recipe
+//   required: true
+//   type: string
+// produces:
+// - application/json
+// responses:
+//     '200':
+//         description: Successful operation
+//     '400':
+//         description: Invalid input
+//     '404':
+//         description: Invalid recipe ID
 func UpdateRecipesHandler(c *gin.Context) {
 	id := c.Param("id")
 	var recipe Recipe
@@ -74,6 +129,22 @@ func UpdateRecipesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, recipe)
 }
 
+// swagger:operation DELETE /recipes/{id} recipes deleteRecipes
+// Delete an existing recipe
+// ---
+// parameters:
+// - name: id
+//   in: path
+//   description: ID of the recipe
+//   require: true
+//   type: string
+// produces:
+// - application/json
+// responses:
+//     '200':
+//         description: Successful operation
+//     '404':
+//         description: Invalid recipe ID
 func DeleteRecipesHandler(c *gin.Context) {
 	id := c.Param("id")
 
@@ -97,6 +168,20 @@ func DeleteRecipesHandler(c *gin.Context) {
 	})
 }
 
+// swagger:operation GET /recipes/search recipes findRecipe
+// search recipes base on tags
+// ---
+// parameters:
+// - name: tag
+//   in: query
+//   description: recipe tag
+//   required: true
+//   type: string
+// produces:
+// - application/json
+// responses:
+//     '200':
+//         description: Successful operation
 func SearchRecipesHandler(c *gin.Context) {
 	tag := c.Query("tag")
 	listOfRecipes := make([]Recipe, 0)
